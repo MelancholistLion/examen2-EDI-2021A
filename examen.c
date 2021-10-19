@@ -1,127 +1,115 @@
+//PD: Al imprimir no me sale desde el nombre y por lo tanto no termina el ciclo hasta que lo cierro manualmente
+
 #include <stdio.h>
 #include <string.h>
-#define N 5
-#define cadena 20
+#define N 3
 
-void leeArr(int clave[],char nombre[][cadena],float estaturaSueldo[][N],int x);
-void empleadoAlto(float estaturaSueldo[][N],int nombre[],int x);
-int bsq(int arr[][N],int tam);
-void seleccion(float estaturaSueldo[][N],int clave[],char nombre[][cadena],int x);
-void imprime(int clave[N],char *nombre[][cadena],float estaturaSueldo[][N],int x);
+void capEmp(int key[N],char name[N][20],float data[N][2]);
+int empHeight(float datos[N][2]);
+void orderEmpSal(int key[N],char name[N][20],float data[N][2]);
+void printing(int key[N],char name[N][20],float data[N][2]);
 
 int main()
 {
-    int i,j,empleados;
+    int key[N];
+    char name[N][20];
+    float data[N][2];
 
-    printf("Cuantos empleados hay?");
-    scanf("%d",&empleados);
+    int hPos;
 
-    int clave[empleados];
-    char nombre[empleados][cadena];
-    float estaturaSueldo[2][empleados];
+    capEmp(key,name,data);
 
-    leeArr(clave,nombre,estaturaSueldo,empleados);
-    //empleadoAlto(estaturaSueldo,nombre,empleados);
-    //seleccion(estaturaSueldo,clave,nombre,empleados);
-    imprime(clave,nombre,estaturaSueldo,empleados);
+    orderEmpSal(key,name,data);
+    
+    hPos = empHeight(data);
 
+    printing(key,name,data);
 
+    printf("El nombre del empleado más alto es %s\n",name[hPos]);
+    printf("Y su estatura es %f m \n",data[hPos][0]);
+    
     return 0;
 }
 
-void leeArr(int clave[],char nombre[][cadena],float estaturaSueldo[][N],int x)
+void printing(int key[N],char name[N][20],float data[N][2])
 {
     int i;
-    for(i=0;i<x;i++)
+    
+    printf("Clave     Nombre     Estatura     Sueldo \n");
+
+    for(i=0;i<N;i++)
     {
-        printf("Clave: ");
-        scanf("%d",&clave[i]);
-
-        printf("Nombre: ");
-        scanf("%s",&nombre[i][cadena]);
-
-        printf("Estatura: ");
-        scanf("%f",&estaturaSueldo[1][i]);
-
-        printf("Sueldo: ");
-        scanf("%f",&estaturaSueldo[2][i]);
+        printf("%d ",key[i]);
+        printf("%s ",name[i][20]);
+        printf("%f ",data[i][0]);
+        printf("%f\n",data[i][1]);
     }
 }
 
-void empleadoAlto(float estaturaSueldo[][N],int nombre[],int x)
+void orderEmpSal(int key[N],char name[N][20],float data[N][2])
 {
-    int i,pos;
-    pos = bsq(estaturaSueldo,x);
-    printf("El que tiene la mayor estatura es %s con %f",nombre[pos],estaturaSueldo[1][pos]);
+    int i,j;
+    float aux;
+    int auxKey;
+    char auxName[20];
 
+    for(i=0;i<N-1;i++)
+    {
+        for(j=0;j<N-1;j++)
+        {
+            if(data[j][1] < data[j+1][1])
+            {
+                auxKey = key[j];
+                key[j] = key[j+1];
+                key[j+1] = auxKey;
+
+                strcpy(auxName,name[j]);
+                strcpy(name[j],name[j+1]);
+                strcpy(name[j+1],auxName);
+                
+                aux = data[j][0];
+                data[j][0]=data[j+1][0];
+                data[j+1][0] = aux;
+
+                aux = data[j][1];
+                data[j][1]=data[j+1][1];
+                data[j+1][1] = aux;
+            }
+        }
+    }
 }
 
-int bsq(int arr[][N],int tam)
+int empHeight(float d[N][2])
 {
-   int pos,i;
-    pos = 0;
+    int i;
+    float mayor = d[0][0];
+    int pos = 0;
 
-    for(i=0;i<tam;i++)
+    for(i=0;i<N;i++)
     {
-
-        if(pos < arr[1][i])
+        if(d[i][0] > mayor)
         {
+            mayor = d[i][0];
             pos = i;
         }
     }
     return pos;
 }
 
-void seleccion(float estaturaSueldo[][N],int clave[],char nombre[][cadena],int x)
-{
-    int i,pos;
-
-    int aux;
-    char aux1[cadena];
-    float aux2;
-
-   for (i=0;i<x;i++)
-    {
-        for(pos=i;pos<N;pos++)
-        {
-            if(estaturaSueldo[2][i]>estaturaSueldo[2][pos])
-            {
-                aux2=estaturaSueldo[1][i];
-                estaturaSueldo[1][i]=estaturaSueldo[1][pos];
-                estaturaSueldo[1][pos]=aux2;
-
-                aux2=estaturaSueldo[2][i];
-                estaturaSueldo[2][i]=estaturaSueldo[2][pos];
-                estaturaSueldo[2][pos]=aux2;
-
-                aux=clave[i];
-                clave[i]=clave[pos];
-                clave[pos]=aux;
-
-                aux=estaturaSueldo[1][i];
-                estaturaSueldo[1][i]=estaturaSueldo[1][pos];
-                estaturaSueldo[1][pos]=aux;
-
-                memcpy(aux1, nombre[i], cadena);
-                memcpy(nombre[i][cadena], nombre[pos][cadena], cadena);
-                memcpy(nombre[pos][cadena], aux1, cadena);
-            }
-        }
-    }
-}
-
-void imprime(int clave[N],char *nombre[][cadena],float estaturaSueldo[][N],int x)
+void capEmp(int key[N],char name[N][20],float data[N][2])
 {
     int i;
-    printf("Clave ");
-    printf("Nombre ");
-    printf("Estatura ");
-    printf("Sueldo \n");
-    for(i=0;i<x;i++)
+
+    for(i=0;i<N;i++)
     {
-        printf("%d ",clave[i]);
-        printf("%s ",nombre[i][cadena]);
-        printf("%f ",estaturaSueldo[1][i]);
-        printf("%f ",estaturaSueldo[2][i]);
+        printf("Empleado numero %d \n",i);
+        printf("Clave: ");
+        scanf("%d",&key[i]);
+        printf("Nombre: ");
+        scanf("%s",name[i]);
+        printf("Estatura: ");
+        scanf("%f",&data[i][0]);
+        printf("Sueldo: ");
+        scanf("%f",&data[i][1]);
     }
 }
